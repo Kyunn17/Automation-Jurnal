@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import type { AddressInfo } from "node:net";
 import type { Server } from "node:http";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -205,5 +207,16 @@ describe("POST /api/submit dan mock-n8n", () => {
 
     const response = await POST(makeSubmitRequest(oversizedPayload));
     expect(response.status).toBe(413);
+  });
+
+  it("Kriteria 6: kode sisi browser (app/page.tsx) tidak mengandung N8N_WEBHOOK_URL atau N8N_WEBHOOK_SECRET", () => {
+    const pageSource = fs.readFileSync(
+      path.join(process.cwd(), "app", "page.tsx"),
+      "utf-8"
+    );
+
+    expect(pageSource).not.toContain("N8N_WEBHOOK_URL");
+    expect(pageSource).not.toContain("N8N_WEBHOOK_SECRET");
+    expect(pageSource).not.toContain("x-webhook-secret");
   });
 });
